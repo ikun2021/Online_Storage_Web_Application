@@ -154,7 +154,7 @@
                                 <tbody>
                                 <tr th:each="credential:${credentials}">
                                     <td>
-                                        <button type="button" class="btn btn-success" th:onclick="showCredentialModal([[${credential.credentialid}]],[[${credential.url}]],[[${credential.username}]],[[${credential.password}]])">Edit</button>
+                                        <button type="button" class="btn btn-success" th:onclick="showCredentialModal([[${credential.credentialid}]],[[${credential.url}]],[[${credential.username}]],[[${credential.decryptedPassword}]])">Edit</button>
                                         <a class="btn btn-danger" th:href="@{/credential-delete/{credentialid}(credentialid=${credential.credentialid})}">Delete</a>
                                     </td>
                                     <th id="show-credential-url" scope="row" th:text="${credential.url}">Example Credential URL</th>
@@ -187,7 +187,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="note-title" class="col-form-label">Password</label>
-                                                <input type="text" name= "password" class="form-control" id="credential-password" th:filed="${credential.password}" maxlength="30" required>
+                                                <input type="text" name= "decryptedPassword" class="form-control" id="credential-password" th:filed="${credential.decryptedPassword}" maxlength="30" required>
                                             </div>
                                             <button id="submit-credential" type="submit" class="d-none"></button>
                                         </form>

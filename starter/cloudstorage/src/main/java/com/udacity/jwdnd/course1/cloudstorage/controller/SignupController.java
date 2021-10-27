@@ -30,6 +30,7 @@ public class SignupController {
             }
             if (signupError == null) {
                 model.addAttribute("signupSuccess", true);
+                return "login";  //pass “signupSuccess” attribute to login.html and display,  此处不能使用重定向，attribute会丢失！
             } else {
                 model.addAttribute("signupError", signupError);
             }

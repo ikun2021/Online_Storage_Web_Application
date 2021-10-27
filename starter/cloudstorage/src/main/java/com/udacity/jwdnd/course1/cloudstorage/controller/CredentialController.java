@@ -34,25 +34,8 @@ public class CredentialController {
         String credentialError =null;
         String username = principal.getName();
         User user = userService.findByName(username);
-        String password = credential.getPassword();
         credential.setUserid(user.getUserid());
-        SecureRandom random = new SecureRandom();
-        byte[] key = new byte[16];
-        random.nextBytes(key);
-        String encodedKey = Base64.getEncoder().encodeToString(key);
-        String encryptedPassword = encryptionService.encryptValue(password,encodedKey);
-        credential.setKey(encodedKey);
-        credential.setPassword(encryptedPassword);
-        if (credential.getCredentialid()!= null) {
-            try {
-                credentialService.editCredential(credential);
-                model.addAttribute("credentialEditSuccess", "Credential successfully updated.");
-            } catch (Exception e) {
-                e.printStackTrace();
-                credentialEditError = e.toString();
-                model.addAttribute("credentialError", credentialEditError);
-            }
-        } else {
+        if (credential.getCredentialid()== null){
             try {
                 credentialService.addCredential(credential);
                 model.addAttribute("credentialUploadSuccess", "Credential successfully uploaded.");
@@ -60,6 +43,15 @@ public class CredentialController {
                 e.printStackTrace();
                 credentialUploadError = e.toString();
                 model.addAttribute("credentialError", credentialUploadError);
+            }
+        }else{
+            try {
+                credentialService.editCredential(credential);
+                model.addAttribute("credentialEditSuccess", "Credential successfully updated.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                credentialEditError = e.toString();
+                model.addAttribute("credentialError", credentialEditError);
             }
         }
         model.addAttribute("files", fileService.findAllFiles(user.getUserid()));

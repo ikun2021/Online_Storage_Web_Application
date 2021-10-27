@@ -31,29 +31,40 @@ class FileController {
     @Autowired
     private CredentialService credentialService;
 
+    private final long fileMaxSize = 10485760;
+
     @PostMapping("/file-upload")
     public String uploadFile(@RequestParam MultipartFile fileUpload, Model model, Principal principal,
-                             @ModelAttribute("note") Note note, @ModelAttribute("credential") Credential credential)  {
-        String fileUploadError = null;
-        String username = principal.getName();
-        User user = userService.findByName(username);
-        String fileName = fileUpload.getOriginalFilename();
-        long size = fileUpload.getSize();
-        String fileSize = size + " byte";
-        String contentType = fileUpload.getContentType();
-        if(fileService.isFilenameAvailable(fileName)){
-            try {
-                byte[] fileData = fileUpload.getBytes();
-                File file = new File(null,fileName,contentType,fileSize,user.getUserid(),fileData);
-                fileService.addFile(file);
-                model.addAttribute("fileUploadSuccess", "File successfully uploaded.");
-            } catch (IOException e) {
-                e.printStackTrace();
-                fileUploadError = e.toString();
-                model.addAttribute("fileError", fileUploadError);
+                             @ModelAttribute("note") Note note, @ModelAttribute("credential") Credential credential){
+        User user = null;
+        try {
+            String fileUploadError = null;
+            String username = principal.getName();
+            user = userService.findByName(username);
+            if(!fileUpload.isEmpty()){
+                String fileName = fileUpload.getOriginalFilename();
+                if(fileService.isFilenameAvailable(fileName)){
+                    long size = fileUpload.getSize();
+                    if(size<fileMaxSize){
+                        String fileSize = size + " byte";
+                        String contentType = fileUpload.getContentType();
+                        byte[] fileData = new byte[0];
+                        fileData = fileUpload.getBytes();
+                        File file = new File(null,fileName,contentType,fileSize,user.getUserid(),fileData);
+                        fileService.addFile(file);
+                        model.addAttribute("fileUploadSuccess", "File successfully uploaded.");
+                    }else{
+                        model.addAttribute("fileError", "Can't upload a file that exceeds the maximum file size(10M)");
+                    }
+                }else{
+                    model.addAttribute("fileError", "Can't upload files with duplicate names.");
+                }
+            }else{
+                model.addAttribute("fileError", "Can't upload without choosing any files.");
             }
-        }else{
-            model.addAttribute("fileError", "Can't upload files with duplicate names.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            model.addAttribute("fileError", "error when uploading file, try again.");
         }
         model.addAttribute("files", fileService.findAllFiles(user.getUserid()));
         model.addAttribute("notes", noteService.findAllNotes(user.getUserid()));

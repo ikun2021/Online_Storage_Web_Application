@@ -8,10 +8,11 @@ import java.util.List;
 @Mapper
 public interface CredentialMapper {
 
-    @Update("update CREDENTIALS SET url=#{url},username=#{username},key=#{key},password=#{password},userid=#{userid} where credentialid=#{credentialid}")
+    @Update("update CREDENTIALS SET url=#{url},username=#{username},key=#{key},password=#{password},userid=#{userid},decryptedpassword=#{decryptedPassword} where credentialid=#{credentialid}")
     void editCredential(Credential credential);
 
-    @Insert("insert into CREDENTIALS(url,username,key,password,userid) values(#{url},#{username},#{key},#{password},#{userid})")
+
+    @Insert("insert into CREDENTIALS(url,username,key,password,userid,decryptedpassword) values(#{url},#{username},#{key},#{password},#{userid},#{decryptedPassword})")
     @Options(useGeneratedKeys = true, keyProperty = "credentialid")
     void addCredential(Credential credential);
 
